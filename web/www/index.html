@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Draw</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,700|Roboto:400,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/public/bundle.css" />
+</head>
+<body>
+  <header class="header">
+    <button class="header__button js-btn-new">New</button>
+    <button class="header__button js-btn-save">Save</button>
+    <button class="header__button js-btn-load">Load</button>
+    <input type="file" id="js-input-load" style="display:none;" />
+    <h1 class="header__title">Draw</h1>
+  </header>
+
+  <main class="main">
+    <section class="main__toolbox">
+      <ul class="list">
+        <li class="list__item">
+          <button class="js-btn-tool" data-tool="select">Select</button>
+        </li>
+        <li class="list__item">
+          <button class="js-btn-tool" data-tool="move">Move</button>
+        </li>
+        <li class="list__item">
+          <button class="js-btn-tool" data-tool="line">Line</button>
+        </li>
+        <li class="list__item">
+          <button class="js-btn-tool" data-tool="rectangle">Rectangle</button>
+        </li>
+        <li class="list__item">
+          <button class="js-btn-tool" data-tool="circle">Circle</button>
+        </li>
+        <li class="list__item">
+          <button class="js-btn-tool" data-tool="ellipse">Ellipse</button>
+        </li>
+        <li class="list__item">
+          <button class="js-btn-tool" data-tool="jew">Jewish star</button>
+        </li>
+      </ul>
+
+      fill color
+      <input type="color" class="js-input-option" data-option="fillColor" value="#FFFFFF" />
+
+      stroke color
+      <input type="color" class="js-input-option" data-option="strokeColor" value="#000000" />
+
+      stroke width
+      <input type="number" class="js-input-option" data-option="strokeWidth" value="5" />
+    </section>
+    <canvas id="js-canvas" class="main__canvas" width="500" height="500"></canvas>
+  </main>
+
+  <script src="/public/bundle.js"></script>
+</body>
+</html>

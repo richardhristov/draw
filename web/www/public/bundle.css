@@ -1,0 +1,177 @@
+html {
+  box-sizing: border-box;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-size: 1rem;
+  font-family: "Roboto", sans-serif;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #000;
+  background-color: #FFF;
+}
+
+button,
+input {
+  font-family: "Roboto", sans-serif;
+  line-height: 1.5;
+}
+
+a,
+a:visited {
+  color: #000;
+  text-decoration: none;
+}
+
+a:hover {
+  color: _light(#000, -40%);
+}
+
+::selection {
+  background-color: #000;
+  color: #FFF;
+}
+
+h1,
+.h1 {
+  font-size: font-size(3rem);
+  font-weight: 400;
+  margin: 0;
+  margin-top: 0.375rem;
+  margin-bottom: 0.75rem;
+}
+
+h2,
+.h2 {
+  font-size: font-size(2.25rem);
+  font-weight: 400;
+  margin: 0;
+  margin-top: 0.375rem;
+  margin-bottom: 0.75rem;
+}
+
+h3,
+.h3 {
+  font-size: font-size(1.5rem);
+  font-weight: 400;
+  margin: 0;
+  margin-top: 0.1875rem;
+  margin-bottom: 0.375rem;
+}
+
+h4,
+.h4 {
+  font-size: font-size(1.5rem);
+  font-weight: 400;
+  margin: 0;
+  margin-top: 0.09375rem;
+  margin-bottom: 0.1875rem;
+}
+
+h5,
+.h5 {
+  font-size: font-size(1rem);
+  font-weight: 400;
+  margin: 0;
+}
+
+h6,
+.h6 {
+  font-size: font-size(1rem);
+  font-weight: 400;
+  margin: 0;
+}
+
+a.h1,
+a.h2,
+a.h3,
+a.h4,
+a.h5,
+a.h6,
+a.button {
+  display: block;
+}
+
+b,
+strong {
+  font-weight: 700;
+}
+
+p {
+  margin: 0;
+  margin-bottom: 0.75rem;
+}
+
+.underlined {
+  border-bottom: 0.09375rem solid #000;
+}
+
+hr {
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-top: 0.09375rem solid #6e7c92;
+  margin-top: 0.28125rem;
+  padding-top: 0.28125rem;
+}
+
+h1.underlined {
+  padding-bottom: 0.375rem;
+}
+
+h2.underlined {
+  padding-bottom: 0.375rem;
+}
+
+h3.underlined {
+  padding-bottom: 0.1875rem;
+}
+
+h4.underlined {
+  padding-bottom: 0.09375rem;
+}
+
+.text-underline {
+  text-decoration: underline;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-danger {
+  color: #000;
+}
+
+.text-muted {
+  color: #586375;
+}
+
+.text-lg {
+  font-size: 1.5rem;
+}
+
+.text-sm {
+  font-size: 0.85rem;
+}
+
+/*# sourceMappingURL=/public/bundle.css.map */
