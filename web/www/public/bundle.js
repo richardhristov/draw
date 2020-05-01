@@ -11307,17 +11307,15 @@ function drawPath(canvas, el) {
     ctx.lineTo(el.points[i][0], el.points[i][1]);
   }
 
-  ctx.lineTo(el.points[0][0], el.points[0][1]);
+  ctx.lineTo(el.points[0][0], el.points[0][1] - el.strokeWidth / 2);
   return ctx;
 }
 
 function drawEllipse(canvas, el) {
   var ctx = canvas.getContext('2d');
-  var radiusX = el.radiusX ? el.radiusX : el.radius;
-  var radiusY = el.radiusY ? el.radiusY : el.radius;
   ctx.moveTo(el.points[0][0], el.points[0][1]);
   ctx.beginPath();
-  ctx.ellipse(el.points[0][0], el.points[0][1], radiusX / 2, radiusY / 2, 0, 0, 2 * Math.PI);
+  ctx.ellipse(el.points[0][0], el.points[0][1], el.radiusX / 2, el.radiusY / 2, el.angle, 0, 2 * Math.PI);
   return ctx;
 }
 
@@ -11338,9 +11336,16 @@ function drawShape(canvas, el) {
       break;
   }
 
+  ctx.setLineDash([]);
+
   if (el.strokeColor !== null) {
     ctx.lineWidth = el.strokeWidth;
     ctx.strokeStyle = el.strokeColor;
+
+    if (el.strokeDash !== null) {
+      ctx.setLineDash([el.strokeDash, el.strokeDash]);
+    }
+
     ctx.stroke();
   }
 
@@ -11367,33 +11372,44 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.SHAPE_ELLIPSE = exports.SHAPE_CIRCLE = exports.SHAPE_PATH = exports.SHAPE_LINE = void 0;
-var SHAPE_LINE = {
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+var SHAPE_BASE = {
+  fillColor: '#FFFFFF',
+  strokeColor: '#000000',
+  strokeWidth: 5
+};
+
+var SHAPE_LINE = _objectSpread({}, SHAPE_BASE, {
   type: 'line',
-  fillColor: null,
-  strokeColor: '#000000',
-  strokeWidth: 5
-};
+  fillColor: null
+});
+
 exports.SHAPE_LINE = SHAPE_LINE;
-var SHAPE_PATH = {
-  type: 'path',
-  fillColor: '#FFFFFF',
-  strokeColor: '#000000',
-  strokeWidth: 5
-};
+
+var SHAPE_PATH = _objectSpread({}, SHAPE_BASE, {
+  type: 'path'
+});
+
 exports.SHAPE_PATH = SHAPE_PATH;
-var SHAPE_CIRCLE = {
+
+var SHAPE_CIRCLE = _objectSpread({}, SHAPE_BASE, {
   type: 'ellipse',
-  fillColor: '#FFFFFF',
-  strokeColor: '#000000',
-  strokeWidth: 5
-};
+  angle: 0
+});
+
 exports.SHAPE_CIRCLE = SHAPE_CIRCLE;
-var SHAPE_ELLIPSE = {
+
+var SHAPE_ELLIPSE = _objectSpread({}, SHAPE_BASE, {
   type: 'ellipse',
-  fillColor: '#FFFFFF',
-  strokeColor: '#000000',
-  strokeWidth: 5
-};
+  angle: 0
+});
+
 exports.SHAPE_ELLIPSE = SHAPE_ELLIPSE;
 },{}],"js/site.js":[function(require,module,exports) {
 "use strict";
@@ -11418,12 +11434,26 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(n); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
 // Globals
 var $canvas;
 var canvasClickEnd = null;
 var canvasClickStart = null;
+var canvasClickLast = null;
 var shapes = [];
 var shapesForeground = [];
+var shapesSelected = [];
 var options = {
   fillColor: '#FFFFFF',
   strokeColor: '#000000',
@@ -11440,13 +11470,15 @@ function getCursorPosition(e, canvas) {
 function canvasMouseDown(e) {
   canvasClickEnd = getCursorPosition(e, $canvas[0]);
   canvasClickStart = canvasClickEnd;
+  canvasClickLast = canvasClickEnd;
   tool.MouseDown(canvasClickStart);
 }
 
 function canvasMouseUp(e) {
+  tool.MouseUp(canvasClickEnd, canvasClickStart);
   canvasClickEnd = null;
   canvasClickStart = null;
-  tool.MouseUp(canvasClickStart);
+  canvasClickLast = null;
 }
 
 function canvasMouseMove(e) {
@@ -11455,7 +11487,94 @@ function canvasMouseMove(e) {
   }
 
   canvasClickEnd = getCursorPosition(e, $canvas[0]);
-  tool.MouseMove(canvasClickEnd, canvasClickStart);
+  tool.MouseMove(canvasClickEnd, canvasClickStart, canvasClickLast);
+  canvasClickLast = canvasClickEnd;
+}
+
+function rotatePoint(p, origin, angle) {
+  p[0] = p[0] - origin[0];
+  p[1] = p[1] - origin[1];
+  p[0] = p[0] * Math.cos(angle) - p[1] * Math.sin(angle);
+  p[1] = p[1] * Math.cos(angle) + p[0] * Math.sin(angle);
+  p[0] = p[0] + origin[0];
+  p[1] = p[1] + origin[1];
+  return p;
+}
+
+function pointsForRectangle(xy, startXy) {
+  return [[Math.min(xy[0], startXy[0]), Math.min(xy[1], startXy[1])], [Math.max(xy[0], startXy[0]), Math.min(xy[1], startXy[1])], [Math.max(xy[0], startXy[0]), Math.max(xy[1], startXy[1])], [Math.min(xy[0], startXy[0]), Math.max(xy[1], startXy[1])]];
+}
+
+function pointsForEllipse(c, radiusX, radiusY) {
+  var angle = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+  var points = [[c[0] - radiusX / 2, c[1] - radiusY / 2], [c[0] + radiusX / 2, c[1] - radiusY / 2], [c[0] + radiusX / 2, c[1] + radiusY / 2], [c[0] - radiusX / 2, c[1] + radiusY / 2]];
+  return points.map(function (p) {
+    return rotatePoint(p, c, angle);
+  });
+}
+
+function shapeIsIn(shape, points) {
+  if (points.length !== 4) {
+    alert('Error, not implemented!');
+    return;
+  }
+
+  var shapePoints = shape.points;
+
+  if (shape.type === 'ellipse') {
+    var c = shape.points[0];
+    shapePoints = pointsForEllipse(c, shape.radiusX, shape.radiusY, shape.angle);
+  }
+
+  for (var i = 0; i < shapePoints.length; i++) {
+    var _shapePoints$i = _slicedToArray(shapePoints[i], 2),
+        x = _shapePoints$i[0],
+        y = _shapePoints$i[1];
+
+    if (x < points[0][0] || y < points[0][1] || x > points[1][0] || y > points[2][1]) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function refreshSelection() {
+  var shapesNormalized = shapesSelected.map(function (s) {
+    if (s.type === 'ellipse') {
+      return _objectSpread({}, s, {
+        points: pointsForEllipse(s.points[0], s.radiusX, s.radiusY, s.angle)
+      });
+    }
+
+    return s;
+  });
+  var xy1 = [Math.min.apply(null, shapesNormalized.flatMap(function (s) {
+    return s.points.map(function (p) {
+      return -s.strokeWidth + p[0];
+    });
+  })), Math.min.apply(null, shapesNormalized.flatMap(function (s) {
+    return s.points.map(function (p) {
+      return -s.strokeWidth + p[1];
+    });
+  }))];
+  var xy2 = [Math.max.apply(null, shapesNormalized.flatMap(function (s) {
+    return s.points.map(function (p) {
+      return s.strokeWidth + p[0];
+    });
+  })), Math.max.apply(null, shapesNormalized.flatMap(function (s) {
+    return s.points.map(function (p) {
+      return s.strokeWidth + p[1];
+    });
+  }))];
+  shapesForeground = [];
+  shapesForeground.push(_objectSpread({}, SHAPES.SHAPE_PATH, {
+    strokeColor: '#333333',
+    strokeWidth: 1,
+    strokeDash: 4,
+    fillColor: null,
+    points: pointsForRectangle(xy1, xy2)
+  }));
 } // Tools
 
 
@@ -11464,15 +11583,16 @@ var toolLine = {
   MouseDown: function MouseDown(xy) {
     return null;
   },
-  MouseUp: function MouseUp(xy) {
-    return shapes.push(shapesForeground[0]);
+  MouseUp: function MouseUp(xy, startXy) {
+    shapes.push(shapesForeground[0]);
+    shapesForeground = [];
   },
   MouseMove: function MouseMove(xy, startXy) {
     shapesForeground = [];
     shapesForeground.push(_objectSpread({}, SHAPES.SHAPE_LINE, {
       strokeColor: options.strokeColor,
       strokeWidth: options.strokeWidth,
-      points: [canvasClickStart, canvasClickEnd]
+      points: [startXy, xy]
     }));
   }
 };
@@ -11481,8 +11601,9 @@ var toolRectangle = {
   MouseDown: function MouseDown(xy) {
     return null;
   },
-  MouseUp: function MouseUp(xy) {
-    return shapes.push(shapesForeground[0]);
+  MouseUp: function MouseUp(xy, startXy) {
+    shapes.push(shapesForeground[0]);
+    shapesForeground = [];
   },
   MouseMove: function MouseMove(xy, startXy) {
     shapesForeground = [];
@@ -11490,7 +11611,7 @@ var toolRectangle = {
       strokeColor: options.strokeColor,
       strokeWidth: options.strokeWidth,
       fillColor: options.fillColor,
-      points: [[Math.min(xy[0], startXy[0]), Math.min(xy[1], startXy[1])], [Math.max(xy[0], startXy[0]), Math.min(xy[1], startXy[1])], [Math.max(xy[0], startXy[0]), Math.max(xy[1], startXy[1])], [Math.min(xy[0], startXy[0]), Math.max(xy[1], startXy[1])]]
+      points: pointsForRectangle(xy, startXy)
     }));
   }
 };
@@ -11499,19 +11620,22 @@ var toolCircle = {
   MouseDown: function MouseDown(xy) {
     return null;
   },
-  MouseUp: function MouseUp(xy) {
-    return shapes.push(shapesForeground[0]);
+  MouseUp: function MouseUp(xy, startXy) {
+    shapes.push(shapesForeground[0]);
+    shapesForeground = [];
   },
   MouseMove: function MouseMove(xy, startXy) {
-    var radius = Math.max(Math.abs(xy[0] - startXy[0]), Math.abs(xy[1] - startXy[1]));
-    var centerX = radius / 2 + Math.min(xy[0], startXy[0]);
-    var centerY = radius / 2 + Math.min(xy[1], startXy[1]);
+    var radiusX = Math.max(Math.abs(xy[0] - startXy[0]), Math.abs(xy[1] - startXy[1]));
+    var radiusY = radiusX;
+    var centerX = radiusX / 2 + Math.min(xy[0], startXy[0]);
+    var centerY = radiusX / 2 + Math.min(xy[1], startXy[1]);
     shapesForeground = [];
     shapesForeground.push(_objectSpread({}, SHAPES.SHAPE_CIRCLE, {
       strokeColor: options.strokeColor,
       strokeWidth: options.strokeWidth,
       fillColor: options.fillColor,
-      radius: radius,
+      radiusX: radiusX,
+      radiusY: radiusY,
       points: [[centerX, centerY]]
     }));
   }
@@ -11521,8 +11645,9 @@ var toolEllipse = {
   MouseDown: function MouseDown(xy) {
     return null;
   },
-  MouseUp: function MouseUp(xy) {
-    return shapes.push(shapesForeground[0]);
+  MouseUp: function MouseUp(xy, startXy) {
+    shapes.push(shapesForeground[0]);
+    shapesForeground = [];
   },
   MouseMove: function MouseMove(xy, startXy) {
     var radiusX = Math.abs(xy[0] - startXy[0]);
@@ -11540,7 +11665,198 @@ var toolEllipse = {
     }));
   }
 };
-var tools = [toolLine, toolRectangle, toolCircle, toolEllipse]; // Set the initial tool to line
+var toolSelect = {
+  type: 'select',
+  MouseDown: function MouseDown(xy) {
+    return null;
+  },
+  MouseUp: function MouseUp(xy, startXy) {
+    var points = pointsForRectangle(xy, startXy);
+    shapesSelected = shapes.filter(function (s) {
+      return shapeIsIn(s, points);
+    });
+    refreshSelection();
+
+    if (!shapesSelected.length) {
+      return;
+    }
+
+    (0, _jquery.default)('.js-input-option[data-option="strokeColor"]').val(shapesSelected[0].strokeColor);
+    (0, _jquery.default)('.js-input-option[data-option="fillColor"]').val(shapesSelected[0].fillColor);
+    (0, _jquery.default)('.js-input-option[data-option="strokeWidth"]').val(shapesSelected[0].strokeWidth);
+  },
+  MouseMove: function MouseMove(xy, startXy) {
+    shapesForeground = [];
+    shapesForeground.push(_objectSpread({}, SHAPES.SHAPE_PATH, {
+      strokeColor: '#333333',
+      strokeWidth: 1,
+      strokeDash: 4,
+      fillColor: null,
+      points: pointsForRectangle(xy, startXy)
+    }));
+  }
+};
+var toolMove = {
+  type: 'move',
+  MouseDown: function MouseDown(xy) {
+    return null;
+  },
+  MouseUp: function MouseUp(xy, startXy) {
+    return null;
+  },
+  MouseMove: function MouseMove(xy, startXy, lastXy) {
+    var diffX = xy[0] - lastXy[0];
+    var diffY = xy[1] - lastXy[1];
+    shapesSelected.forEach(function (s) {
+      return s.points.forEach(function (p) {
+        p[0] = p[0] + diffX;
+        p[1] = p[1] + diffY;
+      });
+    });
+    refreshSelection();
+  }
+};
+var rotateOrigin = null;
+var rotateUpdating = false;
+var toolRotate = {
+  type: 'rotate',
+  MouseDown: function MouseDown(xy) {
+    if (!shapesSelected.length || !shapesForeground.length) {
+      return;
+    }
+
+    var cWidth = shapesForeground[0].points[1][0] - shapesForeground[0].points[0][0];
+    var cHeight = shapesForeground[0].points[2][1] - shapesForeground[0].points[1][1];
+    rotateOrigin = [shapesForeground[0].points[0][0] + cWidth / 2, shapesForeground[0].points[0][0] + cHeight / 2];
+  },
+  MouseUp: function MouseUp(xy, startXy) {
+    rotateOrigin = null;
+    refreshSelection();
+  },
+  MouseMove: function MouseMove(xy, startXy, lastXy) {
+    if (!shapesSelected.length || !shapesForeground.length) {
+      return;
+    }
+
+    if (rotateUpdating) {
+      return;
+    }
+
+    rotateUpdating = true;
+    var lastAngle = Math.atan2(lastXy[0] - rotateOrigin[0], lastXy[1] - rotateOrigin[1]);
+    var currentAngle = Math.atan2(xy[0] - rotateOrigin[0], xy[1] - rotateOrigin[1]);
+    var angle = lastAngle - currentAngle;
+    angle = Math.min(angle, 0.001);
+    angle = Math.max(angle, -0.001);
+    shapesSelected.forEach(function (s) {
+      return s.points.map(function (p) {
+        p = rotatePoint(p, rotateOrigin, angle);
+
+        if (s.type === 'ellipse') {
+          s.angle = s.angle + angle;
+        }
+      });
+    });
+    shapesForeground.forEach(function (s) {
+      return s.points.map(function (p) {
+        p = rotatePoint(p, rotateOrigin, angle);
+
+        if (s.type === 'ellipse') {
+          s.angle = s.angle + angle;
+        }
+      });
+    });
+    rotateUpdating = false;
+  }
+};
+var scaleXMin = null;
+var scaleXMax = null;
+var scaleYMin = null;
+var scaleYMax = null;
+var scaleWidth = null;
+var scaleHeight = null;
+var scaleOrigin = null;
+var scaleDirection = null;
+var toolScale = {
+  type: 'scale',
+  MouseDown: function MouseDown(xy) {
+    if (!shapesSelected.length || !shapesForeground.length) {
+      return;
+    }
+
+    scaleXMin = Math.min.apply(null, shapesForeground[0].points.map(function (p) {
+      return p[0];
+    }));
+    scaleXMax = Math.max.apply(null, shapesForeground[0].points.map(function (p) {
+      return p[0];
+    }));
+    scaleYMin = Math.min.apply(null, shapesForeground[0].points.map(function (p) {
+      return p[1];
+    }));
+    scaleYMax = Math.max.apply(null, shapesForeground[0].points.map(function (p) {
+      return p[1];
+    }));
+    scaleWidth = scaleXMax - scaleXMin;
+    scaleHeight = scaleYMax - scaleYMin;
+    scaleOrigin = [scaleWidth / 2 + scaleXMin, scaleHeight / 2 + scaleYMin];
+    var xDist = Math.abs(xy[0] - scaleOrigin[0]);
+    var yDist = Math.abs(xy[1] - scaleOrigin[1]);
+
+    if (xDist > yDist) {
+      scaleDirection = xy[0] > scaleOrigin[0] ? 'right' : 'left';
+    } else {
+      scaleDirection = xy[1] > scaleOrigin[1] ? 'down' : 'up';
+    }
+  },
+  MouseUp: function MouseUp(xy, startXy) {
+    scaleXMin = null;
+    scaleXMax = null;
+    scaleYMin = null;
+    scaleYMax = null;
+    scaleWidth = null;
+    scaleHeight = null;
+    scaleOrigin = null;
+    scaleDirection = null;
+  },
+  MouseMove: function MouseMove(xy, startXy, lastXy) {
+    if (!shapesSelected.length || !shapesForeground.length) {
+      return;
+    }
+
+    var xDelta = xy[0] - lastXy[0];
+    var yDelta = xy[1] - lastXy[1];
+    var xFactor = 1 + xDelta / scaleWidth / 2;
+    var yFactor = 1 + yDelta / scaleHeight / 2;
+    shapesSelected.forEach(function (s) {
+      return s.points.forEach(function (p) {
+        if (scaleDirection === 'right' || scaleDirection === 'left') {
+          p[0] = p[0] - scaleOrigin[0];
+          p[0] = p[0] * xFactor;
+          p[0] = p[0] + scaleOrigin[0];
+        }
+
+        if (scaleDirection === 'down' || scaleDirection === 'up') {
+          p[1] = p[1] - scaleOrigin[1];
+          p[1] = p[1] * yFactor;
+          p[1] = p[1] + scaleOrigin[1];
+        }
+      });
+    });
+    shapesSelected.forEach(function (s) {
+      if (s.type === 'ellipse') {
+        if (scaleDirection === 'right' || scaleDirection === 'left') {
+          s.radiusX = s.radiusX * xFactor;
+        }
+
+        if (scaleDirection === 'down' || scaleDirection === 'up') {
+          s.radiusY = s.radiusY * yFactor;
+        }
+      }
+    });
+    refreshSelection();
+  }
+};
+var tools = [toolLine, toolRectangle, toolCircle, toolEllipse, toolSelect, toolMove, toolRotate, toolScale]; // Set the initial tool to line
 
 var tool = toolLine; // Clear the canvas and redraw all shapes
 
@@ -11563,9 +11879,19 @@ function refreshCanvas() {
     return;
   }
 
-  tool = tt;
+  tool = tt; //shapesSelected = [];
+  //shapesForeground = [];
+
   (0, _jquery.default)('.js-btn-tool.selected').removeClass('selected');
   $el.addClass('selected');
+}); // Delete button event listener
+
+(0, _jquery.default)(document).on('click', '.js-btn-delete', function () {
+  shapes = shapes.filter(function (s) {
+    return shapesSelected.indexOf(s) === -1;
+  });
+  shapesSelected = [];
+  shapesForeground = [];
 }); // Options inputs event listener
 
 (0, _jquery.default)(document).on('change', '.js-input-option', function (e) {
@@ -11579,6 +11905,10 @@ function refreshCanvas() {
   }
 
   options[o] = $el.val();
+  shapesSelected.forEach(function (s) {
+    return s[o] = options[o];
+  });
+  refreshSelection();
 }); // New button event listener
 
 (0, _jquery.default)(document).on('click', '.js-btn-new', function (e) {
@@ -11589,6 +11919,7 @@ function refreshCanvas() {
 
   shapes = [];
   shapesForeground = [];
+  shapesSelected = [];
 }); // Save button event listener
 
 (0, _jquery.default)(document).on('click', '.js-btn-save', function (e) {
@@ -11674,16 +12005,17 @@ function refreshCanvas() {
     if (window.localStorage) {
       // Restore from localstorage
       shapes = JSON.parse(window.localStorage.getItem('canvas')) || [];
-      shapesForeground = []; // Save to localstorage every second
+      shapesForeground = [];
+      shapesSelected = []; // Save to localstorage at 2hz
 
       setInterval(function () {
         window.localStorage.setItem('canvas', JSON.stringify(shapes));
-      }, 1000);
+      }, 1000 / 2);
     }
-  } catch (err) {} // Refresh the page at 144hz
+  } catch (err) {} // Refresh the page at 60hz
 
 
-  setInterval(refreshCanvas, 1000 / 144);
+  setInterval(refreshCanvas, 1000 / 60);
 });
 },{"jquery":"../node_modules/jquery/dist/jquery.js","file-saver":"../node_modules/file-saver/dist/FileSaver.min.js","./draw":"js/draw.js","./shapes":"js/shapes.js"}],"bundle.js":[function(require,module,exports) {
 "use strict";
@@ -11727,7 +12059,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51887" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51781" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

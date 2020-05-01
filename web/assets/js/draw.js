@@ -16,7 +16,7 @@ function drawPath(canvas, el) {
   for (let i = 1; i < el.points.length; i++) {
     ctx.lineTo(el.points[i][0], el.points[i][1]);
   }
-  ctx.lineTo(el.points[0][0], el.points[0][1]);
+  ctx.lineTo(el.points[0][0], el.points[0][1] - el.strokeWidth / 2);
 
   return ctx;
 }
@@ -24,12 +24,9 @@ function drawPath(canvas, el) {
 function drawEllipse(canvas, el) {
   const ctx = canvas.getContext('2d');
 
-  let radiusX = el.radiusX ? el.radiusX : el.radius;
-  let radiusY = el.radiusY ? el.radiusY : el.radius;
-
   ctx.moveTo(el.points[0][0], el.points[0][1]);
   ctx.beginPath();
-  ctx.ellipse(el.points[0][0], el.points[0][1], radiusX / 2, radiusY / 2, 0, 0, 2 * Math.PI);
+  ctx.ellipse(el.points[0][0], el.points[0][1], el.radiusX / 2, el.radiusY / 2, el.angle, 0, 2 * Math.PI);
 
   return ctx;
 }
@@ -48,9 +45,14 @@ function drawShape(canvas, el) {
       break;
   }
 
+  ctx.setLineDash([]);
+
   if (el.strokeColor !== null) {
     ctx.lineWidth = el.strokeWidth;
     ctx.strokeStyle = el.strokeColor;
+    if (el.strokeDash !== null) {
+      ctx.setLineDash([el.strokeDash, el.strokeDash,]);
+    }
     ctx.stroke();
   }
   if (el.fillColor !== null) {

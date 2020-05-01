@@ -1,27 +1,28 @@
-export const SHAPE_LINE = {
-  type: 'line',
-  fillColor: null,
+const SHAPE_BASE = {
+  fillColor: '#FFFFFF',
   strokeColor: '#000000',
   strokeWidth: 5,
+};
+
+export const SHAPE_LINE = {
+  ...SHAPE_BASE,
+  type: 'line',
+  fillColor: null,
 };
 
 export const SHAPE_PATH = {
+  ...SHAPE_BASE,
   type: 'path',
-  fillColor: '#FFFFFF',
-  strokeColor: '#000000',
-  strokeWidth: 5,
 };
 
 export const SHAPE_CIRCLE = {
+  ...SHAPE_BASE,
   type: 'ellipse',
-  fillColor: '#FFFFFF',
-  strokeColor: '#000000',
-  strokeWidth: 5,
+  angle: 0,
 };
 
 export const SHAPE_ELLIPSE = {
+  ...SHAPE_BASE,
   type: 'ellipse',
-  fillColor: '#FFFFFF',
-  strokeColor: '#000000',
-  strokeWidth: 5,
+  angle: 0,
 };

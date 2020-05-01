@@ -8,8 +8,10 @@ import * as SHAPES from './shapes';
 let $canvas;
 let canvasClickEnd = null;
 let canvasClickStart = null;
+let canvasClickLast = null;
 let shapes = [];
 let shapesForeground = [];
+let shapesSelected = [];
 const options = {
   fillColor: '#FFFFFF',
   strokeColor: '#000000',
@@ -27,13 +29,15 @@ function getCursorPosition(e, canvas) {
 function canvasMouseDown(e) {
   canvasClickEnd = getCursorPosition(e, $canvas[0]);
   canvasClickStart = canvasClickEnd;
+  canvasClickLast = canvasClickEnd;
   tool.MouseDown(canvasClickStart);
 }
 
 function canvasMouseUp(e) {
+  tool.MouseUp(canvasClickEnd, canvasClickStart);
   canvasClickEnd = null;
   canvasClickStart = null;
-  tool.MouseUp(canvasClickStart);
+  canvasClickLast = null;
 }
 
 function canvasMouseMove(e) {
@@ -42,14 +46,95 @@ function canvasMouseMove(e) {
   }
 
   canvasClickEnd = getCursorPosition(e, $canvas[0]);
-  tool.MouseMove(canvasClickEnd, canvasClickStart);
+  tool.MouseMove(canvasClickEnd, canvasClickStart, canvasClickLast);
+  canvasClickLast = canvasClickEnd;
+}
+
+function rotatePoint(p, origin, angle) {
+  p[0] = p[0] - origin[0];
+  p[1] = p[1] - origin[1];
+  p[0] = (p[0] * Math.cos(angle)) - (p[1] * Math.sin(angle)); 
+  p[1] = (p[1] * Math.cos(angle)) + (p[0] * Math.sin(angle));
+  p[0] = p[0] + origin[0];
+  p[1] = p[1] + origin[1];
+  return p;
+}
+
+function pointsForRectangle(xy, startXy) {
+  return [
+    [Math.min(xy[0], startXy[0]), Math.min(xy[1], startXy[1]),],
+    [Math.max(xy[0], startXy[0]), Math.min(xy[1], startXy[1]),],
+    [Math.max(xy[0], startXy[0]), Math.max(xy[1], startXy[1]),],
+    [Math.min(xy[0], startXy[0]), Math.max(xy[1], startXy[1]),],
+  ];
+}
+
+function pointsForEllipse(c, radiusX, radiusY, angle = 0) {
+  const points = [
+    [c[0] - radiusX / 2, c[1] - radiusY / 2],
+    [c[0] + radiusX / 2, c[1] - radiusY / 2],
+    [c[0] + radiusX / 2, c[1] + radiusY / 2],
+    [c[0] - radiusX / 2, c[1] + radiusY / 2],
+  ];
+  return points.map(p => rotatePoint(p, c, angle));
+}
+
+function shapeIsIn(shape, points) {
+  if (points.length !== 4) {
+    alert('Error, not implemented!');
+    return;
+  }
+  let shapePoints = shape.points;
+  if (shape.type === 'ellipse') {
+    const c = shape.points[0];
+    shapePoints = pointsForEllipse(c, shape.radiusX, shape.radiusY, shape.angle);
+  }
+  for (var i = 0; i < shapePoints.length; i++) {
+    const [x, y] = shapePoints[i];
+    if(x < points[0][0] || y < points[0][1] || x > points[1][0] || y > points[2][1]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function refreshSelection() {
+  const shapesNormalized = shapesSelected.map(s => {
+    if (s.type === 'ellipse') {
+      return {
+        ...s,
+        points: pointsForEllipse(s.points[0], s.radiusX, s.radiusY, s.angle),
+      };
+    }
+    return s;
+  });
+  const xy1 = [
+    Math.min.apply(null, shapesNormalized.flatMap(s => s.points.map(p => -s.strokeWidth + p[0]))),
+    Math.min.apply(null, shapesNormalized.flatMap(s => s.points.map(p => -s.strokeWidth + p[1]))),
+  ];
+  const xy2 = [
+    Math.max.apply(null, shapesNormalized.flatMap(s => s.points.map(p => s.strokeWidth + p[0]))),
+    Math.max.apply(null, shapesNormalized.flatMap(s => s.points.map(p => s.strokeWidth + p[1]))),
+  ];
+  shapesForeground = [];
+  shapesForeground.push({
+    ...SHAPES.SHAPE_PATH,
+    strokeColor: '#333333',
+    strokeWidth: 1,
+    strokeDash: 4,
+    fillColor: null,
+    points: pointsForRectangle(xy1, xy2),
+  });
 }
 
 // Tools
 const toolLine = {
   type: 'line',
   MouseDown: (xy) => null,
-  MouseUp: (xy) => shapes.push(shapesForeground[0]),
+  MouseUp: (xy, startXy) => {
+    shapes.push(shapesForeground[0]);
+    shapesForeground = [];
+  },
   MouseMove: (xy, startXy) => {
     shapesForeground = [];
     shapesForeground.push({
@@ -57,8 +142,8 @@ const toolLine = {
       strokeColor: options.strokeColor,
       strokeWidth: options.strokeWidth,
       points: [
-        canvasClickStart,
-        canvasClickEnd,
+        startXy,
+        xy,
       ],
     });
   },
@@ -67,7 +152,10 @@ const toolLine = {
 const toolRectangle = {
   type: 'rectangle',
   MouseDown: (xy) => null,
-  MouseUp: (xy) => shapes.push(shapesForeground[0]),
+  MouseUp: (xy, startXy) => {
+    shapes.push(shapesForeground[0]);
+    shapesForeground = [];
+  },
   MouseMove: (xy, startXy) => {
     shapesForeground = [];
     shapesForeground.push({
@@ -75,12 +163,7 @@ const toolRectangle = {
       strokeColor: options.strokeColor,
       strokeWidth: options.strokeWidth,
       fillColor: options.fillColor,
-      points: [
-        [Math.min(xy[0], startXy[0]), Math.min(xy[1], startXy[1]),],
-        [Math.max(xy[0], startXy[0]), Math.min(xy[1], startXy[1]),],
-        [Math.max(xy[0], startXy[0]), Math.max(xy[1], startXy[1]),],
-        [Math.min(xy[0], startXy[0]), Math.max(xy[1], startXy[1]),],
-      ],
+      points: pointsForRectangle(xy, startXy),
     });
   },
 };
@@ -88,14 +171,18 @@ const toolRectangle = {
 const toolCircle = {
   type: 'circle',
   MouseDown: (xy) => null,
-  MouseUp: (xy) => shapes.push(shapesForeground[0]),
+  MouseUp: (xy, startXy) => {
+    shapes.push(shapesForeground[0]);
+    shapesForeground = [];
+  },
   MouseMove: (xy, startXy) => {
-    const radius = Math.max(
+    const radiusX = Math.max(
       Math.abs(xy[0] - startXy[0]),
       Math.abs(xy[1] - startXy[1])
     );
-    const centerX = radius / 2 + Math.min(xy[0], startXy[0]);
-    const centerY = radius / 2 + Math.min(xy[1], startXy[1]);
+    const radiusY = radiusX;
+    const centerX = radiusX / 2 + Math.min(xy[0], startXy[0]);
+    const centerY = radiusX / 2 + Math.min(xy[1], startXy[1]);
 
     shapesForeground = [];
     shapesForeground.push({
@@ -103,7 +190,8 @@ const toolCircle = {
       strokeColor: options.strokeColor,
       strokeWidth: options.strokeWidth,
       fillColor: options.fillColor,
-      radius,
+      radiusX,
+      radiusY,
       points: [
         [centerX, centerY,]
       ],
@@ -114,7 +202,10 @@ const toolCircle = {
 const toolEllipse = {
   type: 'ellipse',
   MouseDown: (xy) => null,
-  MouseUp: (xy) => shapes.push(shapesForeground[0]),
+  MouseUp: (xy, startXy) => {
+    shapes.push(shapesForeground[0]);
+    shapesForeground = [];
+  },
   MouseMove: (xy, startXy) => {
     const radiusX = Math.abs(xy[0] - startXy[0]);
     const radiusY = Math.abs(xy[1] - startXy[1]);
@@ -136,11 +227,184 @@ const toolEllipse = {
   },
 };
 
+const toolSelect = {
+  type: 'select',
+  MouseDown: (xy) => null,
+  MouseUp: (xy, startXy) => {
+    const points = pointsForRectangle(xy, startXy);
+    shapesSelected = shapes.filter(s => shapeIsIn(s, points));
+    refreshSelection();
+    if (!shapesSelected.length) {
+      return;
+    }
+    $('.js-input-option[data-option="strokeColor"]').val(shapesSelected[0].strokeColor);
+    $('.js-input-option[data-option="fillColor"]').val(shapesSelected[0].fillColor);
+    $('.js-input-option[data-option="strokeWidth"]').val(shapesSelected[0].strokeWidth);
+  },
+  MouseMove: (xy, startXy) => {
+    shapesForeground = [];
+    shapesForeground.push({
+      ...SHAPES.SHAPE_PATH,
+      strokeColor: '#333333',
+      strokeWidth: 1,
+      strokeDash: 4,
+      fillColor: null,
+      points: pointsForRectangle(xy, startXy),
+    });
+  },
+};
+
+const toolMove = {
+  type: 'move',
+  MouseDown: (xy) => null,
+  MouseUp: (xy, startXy) => null,
+  MouseMove: (xy, startXy, lastXy) => {
+    const diffX = xy[0] - lastXy[0];
+    const diffY = xy[1] - lastXy[1];
+    shapesSelected.forEach(s => s.points.forEach(p => {
+      p[0] = p[0] + diffX;
+      p[1] = p[1] + diffY;
+    }));
+    refreshSelection();
+  },
+};
+
+let rotateOrigin = null;
+let rotateUpdating = false;
+const toolRotate = {
+  type: 'rotate',
+  MouseDown: (xy) => {
+    if (!shapesSelected.length || !shapesForeground.length) {
+      return;
+    }
+    const cWidth = shapesForeground[0].points[1][0] - shapesForeground[0].points[0][0];
+    const cHeight = shapesForeground[0].points[2][1] - shapesForeground[0].points[1][1];
+    rotateOrigin = [
+      shapesForeground[0].points[0][0] + (cWidth / 2),
+      shapesForeground[0].points[0][0] + (cHeight / 2),
+    ];
+  },
+  MouseUp: (xy, startXy) => {
+    rotateOrigin = null;
+    refreshSelection();
+  },
+  MouseMove: (xy, startXy, lastXy) => {
+    if (!shapesSelected.length || !shapesForeground.length) {
+      return;
+    }
+    if (rotateUpdating) {
+      return;
+    }
+    rotateUpdating = true;
+    const lastAngle = Math.atan2(lastXy[0] - rotateOrigin[0], lastXy[1] - rotateOrigin[1]);
+    const currentAngle = Math.atan2(xy[0] - rotateOrigin[0], xy[1] - rotateOrigin[1]);
+    let angle = lastAngle - currentAngle;
+
+    angle = Math.min(angle, 0.001);
+    angle = Math.max(angle, -0.001);
+
+    shapesSelected.forEach(s => s.points.map(p => {
+      p = rotatePoint(p, rotateOrigin, angle);
+      if (s.type === 'ellipse') {
+        s.angle = s.angle + angle;
+      }
+    }));
+    shapesForeground.forEach(s => s.points.map(p => {
+      p = rotatePoint(p, rotateOrigin, angle);
+      if (s.type === 'ellipse') {
+        s.angle = s.angle + angle;
+      }
+    }));
+    rotateUpdating = false;
+  },
+};
+
+let scaleXMin = null;
+let scaleXMax = null;
+let scaleYMin = null;
+let scaleYMax = null;
+let scaleWidth = null;
+let scaleHeight = null;
+let scaleOrigin = null;
+let scaleDirection = null;
+const toolScale = {
+  type: 'scale',
+  MouseDown: (xy) => {
+    if (!shapesSelected.length || !shapesForeground.length) {
+      return;
+    }
+    scaleXMin = Math.min.apply(null, shapesForeground[0].points.map(p => p[0]));
+    scaleXMax = Math.max.apply(null, shapesForeground[0].points.map(p => p[0]));
+    scaleYMin = Math.min.apply(null, shapesForeground[0].points.map(p => p[1]));
+    scaleYMax = Math.max.apply(null, shapesForeground[0].points.map(p => p[1]));
+    scaleWidth = scaleXMax - scaleXMin;
+    scaleHeight = scaleYMax - scaleYMin;
+    scaleOrigin = [
+      (scaleWidth / 2) + scaleXMin,
+      (scaleHeight / 2) + scaleYMin,
+    ];
+    const xDist = Math.abs(xy[0] - scaleOrigin[0]);
+    const yDist = Math.abs(xy[1] - scaleOrigin[1]);
+    if (xDist > yDist) {
+      scaleDirection = xy[0] > scaleOrigin[0] ? 'right' : 'left';
+    } else {
+      scaleDirection = xy[1] > scaleOrigin[1] ? 'down' : 'up';
+    }
+  },
+  MouseUp: (xy, startXy) => {
+    scaleXMin = null;
+    scaleXMax = null;
+    scaleYMin = null;
+    scaleYMax = null;
+    scaleWidth = null;
+    scaleHeight = null;
+    scaleOrigin = null;
+    scaleDirection = null;
+  },
+  MouseMove: (xy, startXy, lastXy) => {
+    if (!shapesSelected.length || !shapesForeground.length) {
+      return;
+    }
+    const xDelta = xy[0] - lastXy[0];
+    const yDelta = xy[1] - lastXy[1];
+    const xFactor = 1 + (xDelta / scaleWidth / 2);
+    const yFactor = 1 + (yDelta / scaleHeight / 2);
+
+    shapesSelected.forEach(s => s.points.forEach(p => {
+      if (scaleDirection === 'right' || scaleDirection === 'left') {
+        p[0] = p[0] - scaleOrigin[0];
+        p[0] = p[0] * xFactor;
+        p[0] = p[0] + scaleOrigin[0];
+      }
+      if (scaleDirection === 'down' || scaleDirection === 'up') {
+        p[1] = p[1] - scaleOrigin[1];
+        p[1] = p[1] * yFactor;
+        p[1] = p[1] + scaleOrigin[1];
+      }
+    }));
+    shapesSelected.forEach(s => {
+      if (s.type === 'ellipse') {
+        if (scaleDirection === 'right' || scaleDirection === 'left') {
+          s.radiusX = s.radiusX * xFactor;
+        }
+        if (scaleDirection === 'down' || scaleDirection === 'up') {
+          s.radiusY = s.radiusY * yFactor;
+        }
+      }
+    });
+    refreshSelection();
+  },
+};
+
 const tools = [
   toolLine,
   toolRectangle,
   toolCircle,
   toolEllipse,
+  toolSelect,
+  toolMove,
+  toolRotate,
+  toolScale,
 ];
 // Set the initial tool to line
 let tool = toolLine;
@@ -164,8 +428,17 @@ $(document).on('click', '.js-btn-tool', function() {
   }
 
   tool = tt;
+  //shapesSelected = [];
+  //shapesForeground = [];
   $('.js-btn-tool.selected').removeClass('selected');
   $el.addClass('selected');
+});
+
+// Delete button event listener
+$(document).on('click', '.js-btn-delete', function() {
+  shapes = shapes.filter(s => shapesSelected.indexOf(s) === -1);
+  shapesSelected = [];
+  shapesForeground = [];
 });
 
 // Options inputs event listener
@@ -179,7 +452,9 @@ $(document).on('change', '.js-input-option', function(e) {
     return;
   }
 
-  options[o] = $el.val(); 
+  options[o] = $el.val();
+  shapesSelected.forEach(s => s[o] = options[o]);
+  refreshSelection();
 });
 
 // New button event listener
@@ -190,6 +465,7 @@ $(document).on('click', '.js-btn-new', function(e) {
   }
   shapes = [];
   shapesForeground = [];
+  shapesSelected = [];
 });
 
 // Save button event listener
@@ -273,14 +549,15 @@ $(document).ready(function() {
       // Restore from localstorage
       shapes = JSON.parse(window.localStorage.getItem('canvas')) || [];
       shapesForeground = [];
+      shapesSelected = [];
 
-      // Save to localstorage every second
+      // Save to localstorage at 2hz
       setInterval(function() {
         window.localStorage.setItem('canvas', JSON.stringify(shapes));
-      }, 1000);
+      }, 1000 / 2);
     }
   } catch(err) {}
 
-  // Refresh the page at 144hz
-  setInterval(refreshCanvas, 1000 / 144);
+  // Refresh the page at 60hz
+  setInterval(refreshCanvas, 1000 / 60);
 });
