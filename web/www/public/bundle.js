@@ -189,7 +189,7 @@ var reloadCSS = require('_css_loader');
 
 module.hot.dispose(reloadCSS);
 module.hot.accept(reloadCSS);
-},{"_css_loader":"../node_modules/parcel-bundler/src/builtins/css-loader.js"}],"../node_modules/process/browser.js":[function(require,module,exports) {
+},{"./fonts\\icomoon.eot":[["icomoon.e7f6fa2e.eot","scss/fonts/icomoon.eot"],"scss/fonts/icomoon.eot"],"./fonts\\icomoon.ttf":[["icomoon.e08af3e5.ttf","scss/fonts/icomoon.ttf"],"scss/fonts/icomoon.ttf"],"./fonts\\icomoon.woff":[["icomoon.e0d852cf.woff","scss/fonts/icomoon.woff"],"scss/fonts/icomoon.woff"],"./fonts\\icomoon.svg":[["icomoon.ee2cd42b.svg","scss/fonts/icomoon.svg"],"scss/fonts/icomoon.svg"],"_css_loader":"../node_modules/parcel-bundler/src/builtins/css-loader.js"}],"../node_modules/process/browser.js":[function(require,module,exports) {
 
 // shim for using process in browser
 var process = module.exports = {}; // cached from whatever global is present so that test runners that stub it
@@ -11320,6 +11320,10 @@ function drawEllipse(canvas, el) {
 }
 
 function drawShape(canvas, el) {
+  if (!el) {
+    return;
+  }
+
   var ctx;
 
   switch (el.type) {
@@ -11428,6 +11432,14 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
@@ -11507,13 +11519,23 @@ function pointsForRectangle(xy, startXy) {
 
 function pointsForEllipse(c, radiusX, radiusY) {
   var angle = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
-  var points = [[c[0] - radiusX / 2, c[1] - radiusY / 2], [c[0] + radiusX / 2, c[1] - radiusY / 2], [c[0] + radiusX / 2, c[1] + radiusY / 2], [c[0] - radiusX / 2, c[1] + radiusY / 2]];
-  return points.map(function (p) {
-    return rotatePoint(p, c, angle);
-  });
+  var angle90 = angle + Math.PI / 2;
+  var ux = radiusX / 2 * Math.cos(angle);
+  var uy = radiusX / 2 * Math.sin(angle);
+  var vx = radiusY / 2 * Math.cos(angle90);
+  var vy = radiusY / 2 * Math.sin(angle90);
+  var width = Math.sqrt(ux * ux + vx * vx) * 2;
+  var height = Math.sqrt(uy * uy + vy * vy) * 2;
+  var x = c[0] - width / 2;
+  var y = c[1] - height / 2;
+  return pointsForRectangle([x + width, y + height], [x, y]);
 }
 
 function shapeIsIn(shape, points) {
+  if (!shape) {
+    return false;
+  }
+
   if (points.length !== 4) {
     alert('Error, not implemented!');
     return;
@@ -11892,6 +11914,37 @@ function refreshCanvas() {
   });
   shapesSelected = [];
   shapesForeground = [];
+}); // Duplicate button event listener
+
+(0, _jquery.default)(document).on('click', '.js-btn-duplicate', function () {
+  var duplicates = shapesSelected.forEach(function (s) {
+    var newS = JSON.parse(JSON.stringify(s));
+    newS.points.forEach(function (p) {
+      p[0] += 10;
+      p[1] += 10;
+    });
+    shapes.push(newS);
+  });
+  shapesSelected = [];
+  shapesForeground = [];
+}); // To front button event listener
+
+(0, _jquery.default)(document).on('click', '.js-btn-to-front', function () {
+  shapes = shapes.filter(function (s) {
+    return shapesSelected.indexOf(s) === -1;
+  });
+  shapes = [].concat(_toConsumableArray(shapes), _toConsumableArray(shapesSelected));
+  shapesSelected = [];
+  shapesForeground = [];
+}); // To back button event listener
+
+(0, _jquery.default)(document).on('click', '.js-btn-to-back', function () {
+  shapes = shapes.filter(function (s) {
+    return shapesSelected.indexOf(s) === -1;
+  });
+  shapes = [].concat(_toConsumableArray(shapesSelected), _toConsumableArray(shapes));
+  shapesSelected = [];
+  shapesForeground = [];
 }); // Options inputs event listener
 
 (0, _jquery.default)(document).on('change', '.js-input-option', function (e) {
@@ -11981,6 +12034,42 @@ function refreshCanvas() {
   };
 
   reader.readAsText(files[0]);
+}); // About button event listener
+
+(0, _jquery.default)(document).on('click', '.js-btn-about', function (e) {
+  window.alert('This is a project intended to demonstrate the author\'s skills in creating a computer graphics app.');
+}); // Export to png button event listener
+
+(0, _jquery.default)(document).on('click', '.js-btn-png', function (e) {
+  if (!window.File || !window.FileReader || !window.FileList || !window.Blob) {
+    alert('Error, your browser does not support loading and saving!');
+    e.preventDefault();
+    return;
+  }
+
+  shapesSelected = [];
+  shapesForeground = [];
+  refreshCanvas();
+  var $download = (0, _jquery.default)('#js-download');
+
+  if (!$download.length) {
+    $download = (0, _jquery.default)('<a id="js-download" style="display:none;"></a>');
+    $download.appendTo(document.body);
+  }
+
+  $canvas[0].toBlob(function (data) {
+    var filename = 'draw.png';
+    (0, _fileSaver.saveAs)(data, filename);
+  });
+});
+
+function resizeCanvas() {
+  $canvas.attr('width', Math.floor((0, _jquery.default)('#js-canvas-container').innerWidth()) - 10);
+  $canvas.attr('height', Math.floor((0, _jquery.default)('#js-canvas-container').innerHeight()) - 10);
+}
+
+(0, _jquery.default)(window).resize(function () {
+  resizeCanvas();
 }); // Initialization event listener
 
 (0, _jquery.default)(document).ready(function () {
@@ -11994,8 +12083,9 @@ function refreshCanvas() {
   if (!$canvas[0].getContext) {
     alert('Error, canvas is not supported!');
     return;
-  } // Bind mouse listeners
+  }
 
+  resizeCanvas(); // Bind mouse listeners
 
   $canvas.mousedown(canvasMouseDown);
   $canvas.mouseup(canvasMouseUp);
@@ -12059,7 +12149,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51781" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53603" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

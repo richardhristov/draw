@@ -12,58 +12,80 @@
 </head>
 <body>
   <header class="header">
-    <button class="header__button js-btn-new">New</button>
-    <button class="header__button js-btn-save">Save</button>
-    <button class="header__button js-btn-load">Load</button>
-    <input type="file" id="js-input-load" style="display:none;" />
+    <div class="header__left">
+      <button class="header__button js-btn-new"><span class="icon-new"></span> New</button>
+      <button class="header__button js-btn-save"><span class="icon-save"></span> Save</button>
+      <button class="header__button js-btn-load"><span class="icon-load"></span> Load</button>
+      <input type="file" id="js-input-load" style="display:none;" />
+      <button class="header__button js-btn-png"><span class="icon-png"></span> Export to PNG</button>
+    </div>
     <h1 class="header__title">Draw</h1>
+    <div class="header__right">
+      <button class="header__button js-btn-about"><span class="icon-about"></span> About</button>
+    </div>
   </header>
-
   <main class="main">
     <section class="main__toolbox">
       <ul class="list">
         <li class="list__item">
-          <button class="js-btn-tool" data-tool="select">Select</button>
+          <button class="js-btn-tool" data-tool="select"><span class="icon-select"></span> Select</button>
         </li>
         <li class="list__item">
-          <button class="js-btn-tool" data-tool="move">Move</button>
+          <button class="js-btn-tool" data-tool="move"><span class="icon-move"></span> Move</button>
         </li>
         <li class="list__item">
-          <button class="js-btn-tool" data-tool="rotate">Rotate</button>
+          <button class="js-btn-tool" data-tool="rotate"><span class="icon-rotate"></span> Rotate</button>
         </li>
         <li class="list__item">
-          <button class="js-btn-tool" data-tool="scale">Scale</button>
+          <button class="js-btn-tool" data-tool="scale"><span class="icon-scale"></span> Scale</button>
         </li>
         <li class="list__item">
-          <button class="js-btn-tool" data-tool="line">Line</button>
+          <button class="js-btn-tool" data-tool="line"><span class="icon-line"></span> Line</button>
         </li>
         <li class="list__item">
-          <button class="js-btn-tool" data-tool="rectangle">Rectangle</button>
+          <button class="js-btn-tool" data-tool="rectangle"><span class="icon-rectangle"></span> Rectangle</button>
         </li>
         <li class="list__item">
-          <button class="js-btn-tool" data-tool="circle">Circle</button>
+          <button class="js-btn-tool" data-tool="circle"><span class="icon-circle"></span> Circle</button>
         </li>
         <li class="list__item">
-          <button class="js-btn-tool" data-tool="ellipse">Ellipse</button>
+          <button class="js-btn-tool" data-tool="ellipse"><span class="icon-ellipse"></span> Ellipse</button>
         </li>
         <li class="list__item">
-          <button class="js-btn-tool" data-tool="jew">Jewish star</button>
+          <button class="js-btn-delete"><span class="icon-delete"></span> Delete</button>
         </li>
         <li class="list__item">
-          <button class="js-btn-delete">Delete</button>
+          <button class="js-btn-duplicate"><span class="icon-duplicate"></span> Duplicate</button>
+        </li>
+        <li class="list__item">
+          <button class="js-btn-to-front"><span class="icon-to-front"></span> To front</button>
+        </li>
+        <li class="list__item">
+          <button class="js-btn-to-back"><span class="icon-to-back"></span> To back</button>
+        </li>
+        <li class="list__item">
+          fill color
+        </li>
+        <li class="list__item">
+          <input type="color" class="js-input-option" data-option="fillColor" value="#FFFFFF" />
+        </li>
+        <li class="list__item">
+          stroke color
+        </li>
+        <li class="list__item">
+          <input type="color" class="js-input-option" data-option="strokeColor" value="#000000" />
+        </li>
+        <li class="list__item">
+          stroke width
+        </li>
+        <li class="list__item">
+          <input type="number" class="js-input-option" data-option="strokeWidth" value="5" />
         </li>
       </ul>
-
-      fill color
-      <input type="color" class="js-input-option" data-option="fillColor" value="#FFFFFF" />
-
-      stroke color
-      <input type="color" class="js-input-option" data-option="strokeColor" value="#000000" />
-
-      stroke width
-      <input type="number" class="js-input-option" data-option="strokeWidth" value="5" />
     </section>
-    <canvas id="js-canvas" class="main__canvas" width="500" height="500"></canvas>
+    <section id="js-canvas-container">
+      <canvas id="js-canvas" class="main__canvas" width="600" height="600"></canvas>
+    </section>
   </main>
 
   <script src="/public/bundle.js"></script>

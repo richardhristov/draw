@@ -70,16 +70,25 @@ function pointsForRectangle(xy, startXy) {
 }
 
 function pointsForEllipse(c, radiusX, radiusY, angle = 0) {
-  const points = [
-    [c[0] - radiusX / 2, c[1] - radiusY / 2],
-    [c[0] + radiusX / 2, c[1] - radiusY / 2],
-    [c[0] + radiusX / 2, c[1] + radiusY / 2],
-    [c[0] - radiusX / 2, c[1] + radiusY / 2],
-  ];
-  return points.map(p => rotatePoint(p, c, angle));
+  const angle90 = angle + Math.PI / 2;
+
+  const ux = radiusX / 2 * Math.cos(angle);
+  const uy = radiusX / 2 * Math.sin(angle);
+  const vx = radiusY / 2 * Math.cos(angle90);
+  const vy = radiusY / 2 * Math.sin(angle90);
+
+  const width = Math.sqrt(ux * ux + vx * vx) * 2;
+  const height = Math.sqrt(uy * uy + vy * vy) * 2;
+  const x = c[0] - (width / 2);
+  const y = c[1] - (height / 2);
+
+  return pointsForRectangle([x+width, y+height,], [x, y,]);
 }
 
 function shapeIsIn(shape, points) {
+  if (!shape) {
+    return false;
+  }
   if (points.length !== 4) {
     alert('Error, not implemented!');
     return;
@@ -441,6 +450,42 @@ $(document).on('click', '.js-btn-delete', function() {
   shapesForeground = [];
 });
 
+// Duplicate button event listener
+$(document).on('click', '.js-btn-duplicate', function() {
+  const duplicates = shapesSelected.forEach(s => {
+    const newS = JSON.parse(JSON.stringify(s));
+    newS.points.forEach(p => {
+      p[0] += 10;
+      p[1] += 10;
+    });
+    shapes.push(newS);
+  });
+  shapesSelected = [];
+  shapesForeground = [];
+});
+
+// To front button event listener
+$(document).on('click', '.js-btn-to-front', function() {
+  shapes = shapes.filter(s => shapesSelected.indexOf(s) === -1);
+  shapes = [
+    ...shapes,
+    ...shapesSelected,
+  ];
+  shapesSelected = [];
+  shapesForeground = [];
+});
+
+// To back button event listener
+$(document).on('click', '.js-btn-to-back', function() {
+  shapes = shapes.filter(s => shapesSelected.indexOf(s) === -1);
+  shapes = [
+    ...shapesSelected,
+    ...shapes,
+  ];
+  shapesSelected = [];
+  shapesForeground = [];
+});
+
 // Options inputs event listener
 $(document).on('change', '.js-input-option', function(e) {
   const $el = $(this);
@@ -527,6 +572,43 @@ $(document).on('input', '#js-input-load', function(e) {
   reader.readAsText(files[0]);
 });
 
+// About button event listener
+$(document).on('click', '.js-btn-about', function(e) {
+  window.alert('This is a project intended to demonstrate the author\'s skills in creating a computer graphics app.');
+});
+
+// Export to png button event listener
+$(document).on('click', '.js-btn-png', function(e) {
+  if (!window.File || !window.FileReader || !window.FileList || !window.Blob) {
+    alert('Error, your browser does not support loading and saving!');
+    e.preventDefault();
+    return;
+  }
+  shapesSelected = [];
+  shapesForeground = [];
+  refreshCanvas();
+
+  let $download = $('#js-download');
+  if (!$download.length) {
+    $download = $('<a id="js-download" style="display:none;"></a>');
+    $download.appendTo(document.body);
+  }
+
+  $canvas[0].toBlob(data => {
+    const filename = 'draw.png';
+    saveAs(data, filename);
+  });
+});
+
+function resizeCanvas() {
+  $canvas.attr('width', Math.floor($('#js-canvas-container').innerWidth()) - 10);
+  $canvas.attr('height', Math.floor($('#js-canvas-container').innerHeight()) - 10);
+}
+
+$(window).resize(function() {
+  resizeCanvas();
+});
+
 // Initialization event listener
 $(document).ready(function() {
   $canvas = $('#js-canvas');
@@ -538,6 +620,7 @@ $(document).ready(function() {
     alert('Error, canvas is not supported!');
     return;
   }
+  resizeCanvas();
 
   // Bind mouse listeners
   $canvas.mousedown(canvasMouseDown);

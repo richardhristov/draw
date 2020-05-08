@@ -1,4 +1,83 @@
+@import "icons/style";
+
 @import "variables";
 
 @import "base/reset.scss";
 @import "base/typography.scss";
+
+.header {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+
+  height: unit(2);
+  background-color: $black;
+  color: $white;
+
+  &__title {
+    margin: 0;
+    text-align: center;
+    height: unit(2);
+  }
+
+  &__left {
+    height: unit(2);
+  }
+
+  &__right {
+    height: unit(2);
+    text-align: right;
+  }
+
+  &__button {
+    outline: none;
+    border: none;
+    height: unit(2);
+    background-color: transparent;
+    color: $white;
+    font-weight: bold;
+    padding: 0 unit(1/2);
+    cursor: pointer;
+    transition: $transition-normal background-color ease-in-out;
+
+    &:hover {
+      background-color: $gray-400;
+    }
+  }
+}
+
+.list {
+  list-style-type: none;
+  margin: 0;
+  padding:0;
+}
+
+.main {
+  display: grid;
+  grid-template-columns: 2fr 10fr;
+  position: absolute;
+  top: unit(2);
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  &__toolbox {
+    text-align: center;
+    button {
+      outline: none;
+      border: none;
+      width: 100%;
+      text-align: center;
+      background-color: transparent;
+      color: $black;
+      background-color: $gray-900;
+      font-weight: bold;
+      padding: unit(1/2);
+      cursor: pointer;
+      transition: $transition-normal background-color ease-in-out;
+  
+      &:hover {
+        background-color: $gray-700;
+      }
+    }
+  }
+}

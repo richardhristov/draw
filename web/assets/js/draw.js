@@ -32,6 +32,9 @@ function drawEllipse(canvas, el) {
 }
 
 function drawShape(canvas, el) {
+  if (!el) {
+    return;
+  }
   let ctx;
   switch (el.type) {
     case 'line':
