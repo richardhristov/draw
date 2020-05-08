@@ -118,12 +118,12 @@ function refreshSelection() {
     return s;
   });
   const xy1 = [
-    Math.min.apply(null, shapesNormalized.flatMap(s => s.points.map(p => -s.strokeWidth + p[0]))),
-    Math.min.apply(null, shapesNormalized.flatMap(s => s.points.map(p => -s.strokeWidth + p[1]))),
+    Math.min.apply(null, shapesNormalized.flatMap(s => s.points.map(p => (-s.strokeWidth/2) + p[0]))),
+    Math.min.apply(null, shapesNormalized.flatMap(s => s.points.map(p => (-s.strokeWidth/2) + p[1]))),
   ];
   const xy2 = [
-    Math.max.apply(null, shapesNormalized.flatMap(s => s.points.map(p => s.strokeWidth + p[0]))),
-    Math.max.apply(null, shapesNormalized.flatMap(s => s.points.map(p => s.strokeWidth + p[1]))),
+    Math.max.apply(null, shapesNormalized.flatMap(s => s.points.map(p => (s.strokeWidth/2) + p[0]))),
+    Math.max.apply(null, shapesNormalized.flatMap(s => s.points.map(p => (s.strokeWidth/2) + p[1]))),
   ];
   shapesForeground = [];
   shapesForeground.push({
@@ -452,7 +452,7 @@ $(document).on('click', '.js-btn-delete', function() {
 
 // Duplicate button event listener
 $(document).on('click', '.js-btn-duplicate', function() {
-  const duplicates = shapesSelected.forEach(s => {
+  shapesSelected.forEach(s => {
     const newS = JSON.parse(JSON.stringify(s));
     newS.points.forEach(p => {
       p[0] += 10;
@@ -498,6 +498,9 @@ $(document).on('change', '.js-input-option', function(e) {
   }
 
   options[o] = $el.val();
+  if (o === 'strokeWidth') {
+    options[o] = parseInt(options[o]);
+  }
   shapesSelected.forEach(s => s[o] = options[o]);
   refreshSelection();
 });

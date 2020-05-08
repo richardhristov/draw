@@ -11573,20 +11573,20 @@ function refreshSelection() {
   });
   var xy1 = [Math.min.apply(null, shapesNormalized.flatMap(function (s) {
     return s.points.map(function (p) {
-      return -s.strokeWidth + p[0];
+      return -s.strokeWidth / 2 + p[0];
     });
   })), Math.min.apply(null, shapesNormalized.flatMap(function (s) {
     return s.points.map(function (p) {
-      return -s.strokeWidth + p[1];
+      return -s.strokeWidth / 2 + p[1];
     });
   }))];
   var xy2 = [Math.max.apply(null, shapesNormalized.flatMap(function (s) {
     return s.points.map(function (p) {
-      return s.strokeWidth + p[0];
+      return s.strokeWidth / 2 + p[0];
     });
   })), Math.max.apply(null, shapesNormalized.flatMap(function (s) {
     return s.points.map(function (p) {
-      return s.strokeWidth + p[1];
+      return s.strokeWidth / 2 + p[1];
     });
   }))];
   shapesForeground = [];
@@ -11917,7 +11917,7 @@ function refreshCanvas() {
 }); // Duplicate button event listener
 
 (0, _jquery.default)(document).on('click', '.js-btn-duplicate', function () {
-  var duplicates = shapesSelected.forEach(function (s) {
+  shapesSelected.forEach(function (s) {
     var newS = JSON.parse(JSON.stringify(s));
     newS.points.forEach(function (p) {
       p[0] += 10;
@@ -11958,6 +11958,11 @@ function refreshCanvas() {
   }
 
   options[o] = $el.val();
+
+  if (o === 'strokeWidth') {
+    options[o] = parseInt(options[o]);
+  }
+
   shapesSelected.forEach(function (s) {
     return s[o] = options[o];
   });
@@ -12149,7 +12154,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "53603" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58072" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
