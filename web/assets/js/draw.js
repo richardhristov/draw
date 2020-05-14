@@ -49,6 +49,9 @@ function drawShape(canvas, el) {
   }
 
   ctx.setLineDash([]);
+  if (typeof el.alpha !== 'undefined') {
+    ctx.globalAlpha = el.alpha;
+  }
 
   if (el.strokeColor !== null) {
     ctx.lineWidth = el.strokeWidth;

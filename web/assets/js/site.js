@@ -16,6 +16,7 @@ const options = {
   fillColor: '#FFFFFF',
   strokeColor: '#000000',
   strokeWidth: 5,
+  alpha: 1,
 };
 
 // Canvas mouse events
@@ -150,6 +151,7 @@ const toolLine = {
       ...SHAPES.SHAPE_LINE,
       strokeColor: options.strokeColor,
       strokeWidth: options.strokeWidth,
+      alpha: options.alpha,
       points: [
         startXy,
         xy,
@@ -172,6 +174,7 @@ const toolRectangle = {
       strokeColor: options.strokeColor,
       strokeWidth: options.strokeWidth,
       fillColor: options.fillColor,
+      alpha: options.alpha,
       points: pointsForRectangle(xy, startXy),
     });
   },
@@ -199,6 +202,7 @@ const toolCircle = {
       strokeColor: options.strokeColor,
       strokeWidth: options.strokeWidth,
       fillColor: options.fillColor,
+      alpha: options.alpha,
       radiusX,
       radiusY,
       points: [
@@ -227,6 +231,7 @@ const toolEllipse = {
       strokeColor: options.strokeColor,
       strokeWidth: options.strokeWidth,
       fillColor: options.fillColor,
+      alpha: options.alpha,
       radiusX,
       radiusY,
       points: [
@@ -249,6 +254,7 @@ const toolSelect = {
     $('.js-input-option[data-option="strokeColor"]').val(shapesSelected[0].strokeColor);
     $('.js-input-option[data-option="fillColor"]').val(shapesSelected[0].fillColor);
     $('.js-input-option[data-option="strokeWidth"]').val(shapesSelected[0].strokeWidth);
+    $('.js-input-option[data-option="alpha"]').val(shapesSelected[0].alpha);
   },
   MouseMove: (xy, startXy) => {
     shapesForeground = [];
@@ -258,6 +264,7 @@ const toolSelect = {
       strokeWidth: 1,
       strokeDash: 4,
       fillColor: null,
+      alpha: 1,
       points: pointsForRectangle(xy, startXy),
     });
   },
@@ -500,6 +507,9 @@ $(document).on('change', '.js-input-option', function(e) {
   options[o] = $el.val();
   if (o === 'strokeWidth') {
     options[o] = parseInt(options[o]);
+  }
+  if (o === 'alpha') {
+    options[o] = parseFloat(options[o]);
   }
   shapesSelected.forEach(s => s[o] = options[o]);
   refreshSelection();

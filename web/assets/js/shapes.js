@@ -2,6 +2,7 @@ const SHAPE_BASE = {
   fillColor: '#FFFFFF',
   strokeColor: '#000000',
   strokeWidth: 5,
+  alpha: 1,
 };
 
 export const SHAPE_LINE = {

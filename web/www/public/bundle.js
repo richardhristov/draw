@@ -11342,6 +11342,10 @@ function drawShape(canvas, el) {
 
   ctx.setLineDash([]);
 
+  if (typeof el.alpha !== 'undefined') {
+    ctx.globalAlpha = el.alpha;
+  }
+
   if (el.strokeColor !== null) {
     ctx.lineWidth = el.strokeWidth;
     ctx.strokeStyle = el.strokeColor;
@@ -11386,7 +11390,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 var SHAPE_BASE = {
   fillColor: '#FFFFFF',
   strokeColor: '#000000',
-  strokeWidth: 5
+  strokeWidth: 5,
+  alpha: 1
 };
 
 var SHAPE_LINE = _objectSpread({}, SHAPE_BASE, {
@@ -11469,7 +11474,8 @@ var shapesSelected = [];
 var options = {
   fillColor: '#FFFFFF',
   strokeColor: '#000000',
-  strokeWidth: 5
+  strokeWidth: 5,
+  alpha: 1
 }; // Canvas mouse events
 
 function getCursorPosition(e, canvas) {
@@ -11614,6 +11620,7 @@ var toolLine = {
     shapesForeground.push(_objectSpread({}, SHAPES.SHAPE_LINE, {
       strokeColor: options.strokeColor,
       strokeWidth: options.strokeWidth,
+      alpha: options.alpha,
       points: [startXy, xy]
     }));
   }
@@ -11633,6 +11640,7 @@ var toolRectangle = {
       strokeColor: options.strokeColor,
       strokeWidth: options.strokeWidth,
       fillColor: options.fillColor,
+      alpha: options.alpha,
       points: pointsForRectangle(xy, startXy)
     }));
   }
@@ -11656,6 +11664,7 @@ var toolCircle = {
       strokeColor: options.strokeColor,
       strokeWidth: options.strokeWidth,
       fillColor: options.fillColor,
+      alpha: options.alpha,
       radiusX: radiusX,
       radiusY: radiusY,
       points: [[centerX, centerY]]
@@ -11681,6 +11690,7 @@ var toolEllipse = {
       strokeColor: options.strokeColor,
       strokeWidth: options.strokeWidth,
       fillColor: options.fillColor,
+      alpha: options.alpha,
       radiusX: radiusX,
       radiusY: radiusY,
       points: [[centerX, centerY]]
@@ -11706,6 +11716,7 @@ var toolSelect = {
     (0, _jquery.default)('.js-input-option[data-option="strokeColor"]').val(shapesSelected[0].strokeColor);
     (0, _jquery.default)('.js-input-option[data-option="fillColor"]').val(shapesSelected[0].fillColor);
     (0, _jquery.default)('.js-input-option[data-option="strokeWidth"]').val(shapesSelected[0].strokeWidth);
+    (0, _jquery.default)('.js-input-option[data-option="alpha"]').val(shapesSelected[0].alpha);
   },
   MouseMove: function MouseMove(xy, startXy) {
     shapesForeground = [];
@@ -11714,6 +11725,7 @@ var toolSelect = {
       strokeWidth: 1,
       strokeDash: 4,
       fillColor: null,
+      alpha: 1,
       points: pointsForRectangle(xy, startXy)
     }));
   }
@@ -11963,6 +11975,10 @@ function refreshCanvas() {
     options[o] = parseInt(options[o]);
   }
 
+  if (o === 'alpha') {
+    options[o] = parseFloat(options[o]);
+  }
+
   shapesSelected.forEach(function (s) {
     return s[o] = options[o];
   });
@@ -12154,7 +12170,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58072" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61227" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
