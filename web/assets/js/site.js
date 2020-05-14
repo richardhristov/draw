@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import { saveAs, } from 'file-saver';
+import { v4 as uuidv4 } from 'uuid';
 
 import { updateCanvas, clearCanvas, } from './draw';
 import * as SHAPES from './shapes';
@@ -247,6 +248,14 @@ const toolSelect = {
   MouseUp: (xy, startXy) => {
     const points = pointsForRectangle(xy, startXy);
     shapesSelected = shapes.filter(s => shapeIsIn(s, points));
+    shapesSelected.forEach(s => {
+      if (!s || !s.groupId) {
+        return;
+      }
+      shapes
+        .filter(ss => ss && ss.groupId == s.groupId && shapesSelected.indexOf(ss) === -1)
+        .forEach(ss => shapesSelected.push(ss));
+    });
     refreshSelection();
     if (!shapesSelected.length) {
       return;
@@ -491,6 +500,21 @@ $(document).on('click', '.js-btn-to-back', function() {
   ];
   shapesSelected = [];
   shapesForeground = [];
+});
+
+// Group button event listener
+$(document).on('click', '.js-btn-group', function() {
+  const groupId = uuidv4();
+  shapesSelected.forEach(s => s.groupId = groupId);
+});
+
+// Ungroup button event listener
+$(document).on('click', '.js-btn-ungroup', function() {
+  shapesSelected.filter(s => s && s.groupId).forEach(s => {
+    shapes
+      .filter(ss => ss && ss.groupId === s.groupId)
+      .forEach(ss => ss.groupId = null);
+  });
 });
 
 // Options inputs event listener

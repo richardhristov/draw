@@ -3,6 +3,7 @@ const SHAPE_BASE = {
   strokeColor: '#000000',
   strokeWidth: 5,
   alpha: 1,
+  groupId: null,
 };
 
 export const SHAPE_LINE = {
