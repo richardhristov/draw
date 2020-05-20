@@ -325,8 +325,8 @@ const toolRotate = {
     const currentAngle = Math.atan2(xy[0] - rotateOrigin[0], xy[1] - rotateOrigin[1]);
     let angle = lastAngle - currentAngle;
 
-    angle = Math.min(angle, 0.001);
-    angle = Math.max(angle, -0.001);
+    angle = Math.min(angle, 0.002);
+    angle = Math.max(angle, -0.002);
 
     shapesSelected.forEach(s => s.points.map(p => {
       p = rotatePoint(p, rotateOrigin, angle);

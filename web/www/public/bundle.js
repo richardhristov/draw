@@ -12463,8 +12463,8 @@ var toolRotate = {
     var lastAngle = Math.atan2(lastXy[0] - rotateOrigin[0], lastXy[1] - rotateOrigin[1]);
     var currentAngle = Math.atan2(xy[0] - rotateOrigin[0], xy[1] - rotateOrigin[1]);
     var angle = lastAngle - currentAngle;
-    angle = Math.min(angle, 0.001);
-    angle = Math.max(angle, -0.001);
+    angle = Math.min(angle, 0.002);
+    angle = Math.max(angle, -0.002);
     shapesSelected.forEach(function (s) {
       return s.points.map(function (p) {
         p = rotatePoint(p, rotateOrigin, angle);
