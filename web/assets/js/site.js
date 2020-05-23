@@ -242,6 +242,36 @@ const toolEllipse = {
   },
 };
 
+const toolTriangle = {
+  type: 'triangle',
+  MouseDown: (xy) => null,
+  MouseUp: (xy, startXy) => {
+    shapes.push(shapesForeground[0]);
+    shapesForeground = [];
+  },
+  MouseMove: (xy, startXy) => {
+    shapesForeground = [];
+    const triangle = {
+      ...SHAPES.SHAPE_TRIANGLE(),
+    };
+    const width = Math.max(xy[0], startXy[0]) - Math.min(xy[0], startXy[0]);
+    const height = Math.max(xy[1], startXy[1]) - Math.min(xy[1], startXy[1]);
+    triangle.points.forEach(p => {
+      p[0] = p[0] * (width / 6);
+      p[1] = p[1] * (height / 6);
+      p[0] = p[0] + Math.min(xy[0], startXy[0]);
+      p[1] = p[1] + Math.min(xy[1], startXy[1]);
+    });
+    shapesForeground.push({
+      ...triangle,
+      strokeColor: options.strokeColor,
+      strokeWidth: options.strokeWidth,
+      fillColor: options.fillColor,
+      alpha: options.alpha,
+    });
+  },
+};
+
 const toolSelect = {
   type: 'select',
   MouseDown: (xy) => null,
@@ -426,6 +456,7 @@ const tools = [
   toolRectangle,
   toolCircle,
   toolEllipse,
+  toolTriangle,
   toolSelect,
   toolMove,
   toolRotate,

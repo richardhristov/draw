@@ -12048,7 +12048,7 @@ function clearCanvas(canvas) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.SHAPE_ELLIPSE = exports.SHAPE_CIRCLE = exports.SHAPE_PATH = exports.SHAPE_LINE = void 0;
+exports.SHAPE_ELLIPSE = exports.SHAPE_CIRCLE = exports.SHAPE_TRIANGLE = exports.SHAPE_PATH = exports.SHAPE_LINE = void 0;
 
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
@@ -12076,6 +12076,14 @@ var SHAPE_PATH = _objectSpread({}, SHAPE_BASE, {
 });
 
 exports.SHAPE_PATH = SHAPE_PATH;
+
+var SHAPE_TRIANGLE = function SHAPE_TRIANGLE() {
+  return _objectSpread({}, SHAPE_PATH, {
+    points: [[3, 0], [3, 6], [6, 3]]
+  });
+};
+
+exports.SHAPE_TRIANGLE = SHAPE_TRIANGLE;
 
 var SHAPE_CIRCLE = _objectSpread({}, SHAPE_BASE, {
   type: 'ellipse',
@@ -12369,6 +12377,36 @@ var toolEllipse = {
     }));
   }
 };
+var toolTriangle = {
+  type: 'triangle',
+  MouseDown: function MouseDown(xy) {
+    return null;
+  },
+  MouseUp: function MouseUp(xy, startXy) {
+    shapes.push(shapesForeground[0]);
+    shapesForeground = [];
+  },
+  MouseMove: function MouseMove(xy, startXy) {
+    shapesForeground = [];
+
+    var triangle = _objectSpread({}, SHAPES.SHAPE_TRIANGLE());
+
+    var width = Math.max(xy[0], startXy[0]) - Math.min(xy[0], startXy[0]);
+    var height = Math.max(xy[1], startXy[1]) - Math.min(xy[1], startXy[1]);
+    triangle.points.forEach(function (p) {
+      p[0] = p[0] * (width / 6);
+      p[1] = p[1] * (height / 6);
+      p[0] = p[0] + Math.min(xy[0], startXy[0]);
+      p[1] = p[1] + Math.min(xy[1], startXy[1]);
+    });
+    shapesForeground.push(_objectSpread({}, triangle, {
+      strokeColor: options.strokeColor,
+      strokeWidth: options.strokeWidth,
+      fillColor: options.fillColor,
+      alpha: options.alpha
+    }));
+  }
+};
 var toolSelect = {
   type: 'select',
   MouseDown: function MouseDown(xy) {
@@ -12573,7 +12611,7 @@ var toolScale = {
     refreshSelection();
   }
 };
-var tools = [toolLine, toolRectangle, toolCircle, toolEllipse, toolSelect, toolMove, toolRotate, toolScale]; // Set the initial tool to line
+var tools = [toolLine, toolRectangle, toolCircle, toolEllipse, toolTriangle, toolSelect, toolMove, toolRotate, toolScale]; // Set the initial tool to line
 
 var tool = toolLine; // Clear the canvas and redraw all shapes
 
@@ -12872,7 +12910,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "61227" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "51900" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

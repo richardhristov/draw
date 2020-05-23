@@ -17,6 +17,15 @@ export const SHAPE_PATH = {
   type: 'path',
 };
 
+export const SHAPE_TRIANGLE = () => ({
+  ...SHAPE_PATH,
+  points: [
+    [3, 0],
+    [3, 6],
+    [6, 3],
+  ]
+});
+
 export const SHAPE_CIRCLE = {
   ...SHAPE_BASE,
   type: 'ellipse',
